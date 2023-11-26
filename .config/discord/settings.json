@@ -1,0 +1,18 @@
+{
+  "IS_MAXIMIZED": false,
+  "IS_MINIMIZED": false,
+  "WINDOW_BOUNDS": {
+    "x": 14,
+    "y": 48,
+    "width": 976,
+    "height": 1018
+  },
+  "DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOURE_DOING": true,
+  "MIN_WIDTH": 940,
+  "MIN_HEIGHT": 500,
+  "openasar": {
+    "setup": true,
+    "css": ""
+  },
+  "trayBalloonShown": true
+}
