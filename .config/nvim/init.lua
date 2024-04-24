@@ -11,7 +11,7 @@ vim.api.nvim_set_keymap('i', '{', '{}<left>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '{<CR>', '{<CR>}<ESC>O', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '{;<CR>', '{<CR>};<ESC>O', { noremap = true, silent = true })
 
-vim.o.guifont = "CaskaydiaCove Nerd Font:h20"
+--vim.o.guifont = "CaskaydiaCove Nerd Font:h20"
 
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
