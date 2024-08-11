@@ -1,4 +1,11 @@
+vim.opt.termguicolors = true
 require("personal")
+
+vim.cmd 'so'
+vim.cmd 'colorscheme slate'
+
+vim.g.mapleader = " "
+vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 vim.wo.number = true
 vim.wo.relativenumber = true
@@ -10,8 +17,6 @@ vim.api.nvim_set_keymap('i', '[', '[]<left>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '{', '{}<left>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '{<CR>', '{<CR>}<ESC>O', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '{;<CR>', '{<CR>};<ESC>O', { noremap = true, silent = true })
-
---vim.o.guifont = "CaskaydiaCove Nerd Font:h20"
 
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
@@ -52,6 +57,35 @@ cmp.setup({
   },
 })
 
+
 -- Set up key mapping for Ctrl + C to copy to system clipboard in visual mode
 vim.api.nvim_set_keymap('v', '<C-c>', '"+y<CR>', { noremap = true })
+
+-- Always use block cursor in all modes
+vim.o.guicursor = 'n-v-c:block-Cursor,i:block-Cursor,ve:block-Cursor,r-cr:block-Cursor,o:hor20-Cursor,sm:block-Cursor'
+
+
+-- Tabs
+
+-- Function to map keys
+local function map(mode, lhs, rhs, opts)
+    local options = { noremap = true, silent = true }
+    if opts then
+        options = vim.tbl_extend('force', options, opts)
+    end
+    vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+end
+
+-- Map Ctrl+l to go to the next tab
+map('n', '<C-l>', ':tabnext<CR>')
+
+-- Map Ctrl+h to go to the previous tab
+map('n', '<C-h>', ':tabprevious<CR>')
+
+
+-- Map Ctrl+t to open a new tab and start netrw
+map('n', '<C-t>', ':tabnew | :Ex<CR>')
+
+-- Map Ctrl+w to close the current tab
+map('n', '<C-w>', ':tabclose<CR>')
 
