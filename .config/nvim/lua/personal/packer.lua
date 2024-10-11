@@ -32,9 +32,18 @@ return require('packer').startup(function(use)
 
 	use { "norcalli/nvim-colorizer.lua" }
 
-	use{ 'anuvyklack/pretty-fold.nvim',
-	config = function()
-		require('pretty-fold').setup()
-	end
-}
+	use { 'Mofiqul/vscode.nvim' }
+
+	-- Add this in the packer setup function
+	use {
+		'nvim-lualine/lualine.nvim',
+		requires = { 'kyazdani42/nvim-web-devicons', opt = true } -- Optional icons
+	}
+
+	use {
+		"ellisonleao/gruvbox.nvim",
+		requires = {"rktjmp/lush.nvim"}
+	}
+
+
 end)

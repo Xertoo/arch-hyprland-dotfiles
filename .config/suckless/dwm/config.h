@@ -9,6 +9,7 @@ static const int topbar = 1;            /* 0 means bottom bar */
 static const char *fonts[]    ={ "GohuFont:style=Medium:size=11" };
 static const char dmenufont[] =  "GohuFont:style=Medium:size=11";
 
+//DEFAULT COLOURSCHEME
 // Background color for unselected windows
 static const char col_gray1[] = "#222222";
 // Border color for unselected windows
@@ -21,10 +22,29 @@ static const char col_gray4[] = "#eeeeee";
 static const char col_cyan[]  = "#005577";
 
 static const char *colors[][3] = {
-    /*               fg         bg         border   */
-    [SchemeNorm] = {col_gray3, col_gray1, col_gray2},
-    [SchemeSel] = {col_gray4, col_cyan, col_cyan},
+	/*               fg         bg         border   */
+	[SchemeNorm] = {col_gray3, col_gray1, col_gray2},
+	[SchemeSel] = {col_gray4, col_cyan, col_cyan},
 };
+
+//// GRUVBOX COLOURSCHEME
+//// Background color for unselected windows
+//static const char col_gray1[] = "#282828";
+//// Border color for unselected windows
+//static const char col_gray2[] = "#3c3836";
+//// Text (foreground) color for unselected windows
+//static const char col_gray3[] = "#a89984";
+//// Text (foreground) color for selected windows
+//static const char col_gray4[] = "#ebdbb2";
+//// Background and border color for selected windows
+//static const char col_cyan[]  = "#458588";
+//
+//static const char *colors[][3] = {
+	///*               fg         bg         border   */
+	//[SchemeNorm] = {col_gray3, col_gray1, col_gray2},
+	//[SchemeSel] = {col_gray4, col_cyan, col_cyan},
+//};
+
 
 /* tagging */
 static const char *tags[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
@@ -77,10 +97,11 @@ static const char *dmenucmd[] = {
 static const char *termcmd[] = {"st", NULL};
 
 static const char *firefoxcmd[] = {"firefox", NULL};
+static const char *slock[] = {"slock", NULL};
 static const char *screenshotcmd[] = {
     "sh", "-c",
     "maim -g \"$(slop -f '%wx%h+%x+%y')\" "
-    "~/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png",
+    "| tee ~/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png | xclip -selection clipboard -t image/png",
     NULL};
 static const char *volupcmd[] = {"wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@",
                                  "5%+", NULL};
@@ -122,14 +143,16 @@ static const Key keys[] = {
 
     // My Custom Binds
     {MODKEY, XK_b, spawn, {.v = firefoxcmd}},
-    {0, XK_Print, spawn, {.v = screenshotcmd}},
+    {MODKEY, XK_s, spawn, {.v = slock}},
+    {MODKEY | ShiftMask,  XK_s, spawn, {.v = screenshotcmd}},
 
     {MODKEY, XK_x, spawn, {.v = volupcmd}},
     {MODKEY, XK_z, spawn, {.v = voldowncmd}},
 
-    TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
-        TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
-            TAGKEYS(XK_9, 8){MODKEY | ShiftMask, XK_e, quit, {0}},
+
+	TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
+		TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
+		TAGKEYS(XK_9, 8){MODKEY | ShiftMask, XK_e, quit, {0}},
 };
 
 /* button definitions */

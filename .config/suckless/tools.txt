@@ -1,0 +1,11 @@
+requirements:
+    dwm:
+        maim,
+        slop
+
+wants:
+    ranger,
+    ice-cat,
+    cmus,
+    picom,
+
