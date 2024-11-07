@@ -6,7 +6,7 @@ vim.cmd 'so'
 
 -- Gruvbox colorscheme setup
 vim.o.background = "dark" -- or "light" for light mode
-vim.cmd([[colorscheme gruvbox]])
+vim.cmd([[colorscheme habamax]])
 vim.api.nvim_set_hl(0, "Normal", { bg = "#1d2021" })
 
 -- Lualine
@@ -39,6 +39,17 @@ require('lualine').setup {
   extensions = {}
 }
 
+require('lsp_signature').setup({
+    bind = true,  -- This is mandatory, otherwise border config won’t get registered
+    hint_enable = true, -- Enable inline parameter hints
+    floating_window = true, -- Show hints in a floating window
+    floating_window_above_cur_line = true, -- Place floating window above the current line
+    hint_prefix = "[HINT] ",  -- Prefix for each hint (customize as needed)
+    handler_opts = {
+        border = "rounded"  -- Border style for the floating window
+    },
+    hi_parameter = "IncSearch", -- Highlight the active parameter
+})
 
 vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
@@ -177,4 +188,3 @@ map('n', '<C-t>', ':tabnew | :Ex<CR>')
 
 -- Map Ctrl+w to close the current tab
 map('n', '<C-w>', ':tabclose<CR>')
-

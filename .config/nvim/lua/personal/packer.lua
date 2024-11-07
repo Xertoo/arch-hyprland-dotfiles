@@ -44,6 +44,7 @@ return require('packer').startup(function(use)
 		"ellisonleao/gruvbox.nvim",
 		requires = {"rktjmp/lush.nvim"}
 	}
-
+	
+	use "ray-x/lsp_signature.nvim"
 
 end)
