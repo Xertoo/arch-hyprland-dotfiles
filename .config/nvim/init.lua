@@ -1,190 +1,322 @@
-vim.opt.termguicolors = true
-require("personal")
+-- BOOTSTRAP lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git", "clone", "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath
+  })
+end
+vim.opt.rtp:prepend(lazypath)
 
-vim.cmd 'so'
-
-
--- Gruvbox colorscheme setup
-vim.o.background = "dark" -- or "light" for light mode
-vim.cmd([[colorscheme habamax]])
-vim.api.nvim_set_hl(0, "Normal", { bg = "#1d2021" })
-
--- Lualine
-require('lualine').setup {
-  options = {
-    icons_enabled = false, -- Enable icons
-    theme = 'gruvbox',    -- Set lualine to use the gruvbox theme
-    component_separators = { left = '|', right = '|' }, -- Simple separators
-    section_separators = { left = '', right = '' },     -- No section separators
-    disabled_filetypes = { 'NvimTree', 'packer' }, -- Ignore specific filetypes
-    globalstatus = true, -- Use a single statusline for all windows
+-- SETUP PLUGINS
+require("lazy").setup({
+	-- Lazy.nvim
+  {
+	  "folke/lazy.nvim",
   },
-  sections = {
-    lualine_a = {'mode'},          -- Mode section
-    lualine_b = {'branch', 'diff', 'diagnostics'}, -- Git branch, diff status, diagnostics
-    lualine_c = {'filename'},      -- Filename
-    lualine_x = {'encoding', 'fileformat', 'filetype'}, -- Encoding, file format, and type
-    lualine_y = {'progress'},      -- File progress
-    lualine_z = {'location'}       -- Cursor location (line:column)
-  },
-  inactive_sections = {
-    lualine_a = {},
-    lualine_b = {},
-    lualine_c = {'filename'},      -- Show filename when inactive
-    lualine_x = {'location'},      -- Show location (line:column) when inactive
-    lualine_y = {},
-    lualine_z = {}
-  },
-  tabline = {},
-  extensions = {}
-}
 
-require('lsp_signature').setup({
-    bind = true,  -- This is mandatory, otherwise border config won’t get registered
-    hint_enable = true, -- Enable inline parameter hints
-    floating_window = true, -- Show hints in a floating window
-    floating_window_above_cur_line = true, -- Place floating window above the current line
-    hint_prefix = "[HINT] ",  -- Prefix for each hint (customize as needed)
-    handler_opts = {
-        border = "rounded"  -- Border style for the floating window
+    -- Kanagawa colorscheme
+  {
+    "rebelot/kanagawa.nvim",
+    priority = 1000,
+    config = function()
+      require("kanagawa").setup({
+        compile = false,
+        undercurl = true,
+        commentStyle = { italic = true },
+        functionStyle = { bold = true },
+        keywordStyle = { italic = true, bold = true },
+        statementStyle = { bold = true },
+        typeStyle = { bold = true },
+        transparent = false,
+        dimInactive = false,
+        terminalColors = true,
+        colors = {
+          palette = {
+            sumiInk0 = "#000000",
+          },
+          theme = {
+            dragon = {
+              ui = {
+                bg = "#000000",
+                bg_p1 = "#000000",
+                float = "#000000",
+              },
+              syn = {
+                string = "#00FF87",
+                functionName = "#80FFFF",
+                keyword = "#FF75B5",
+                statement = "#FFB86C",
+              },
+            },
+          },
+        },
+        overrides = function(colors)
+          return {
+            Normal = { bg = "#000000" },
+            NormalNC = { bg = "#000000" },
+            NormalFloat = { bg = "#000000" },
+            FloatBorder = { bg = "#000000" },
+            TelescopeNormal = { bg = "#000000" },
+            Comment = { fg = colors.palette.oniViolet, italic = true },
+            Function = { fg = "#80FFFF", bold = true },
+            Keyword = { fg = "#FF75B5", bold = true, italic = true },
+            String = { fg = "#00FF87" },
+            Statement = { fg = "#FFB86C", bold = true },
+          }
+        end,
+        theme = "dragon",
+        background = {
+          dark = "dragon",
+          light = "lotus"
+        },
+      })
+      vim.cmd("colorscheme kanagawa-dragon")
+    end
+  },
+
+  -- LSP with Mason
+  {
+	  "williamboman/mason.nvim",
+	  build = ":MasonUpdate",
+	  config = function()
+		  require("mason").setup()
+	  end,
+  },
+
+  {
+	  "williamboman/mason-lspconfig.nvim",
+	  dependencies = { "williamboman/mason.nvim", "neovim/nvim-lspconfig" },
+  },
+
+  -- Completion
+  {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "L3MON4D3/LuaSnip",
     },
-    hi_parameter = "IncSearch", -- Highlight the active parameter
+    config = function()
+      local cmp = require("cmp")
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            require("luasnip").lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ["<Tab>"] = cmp.mapping.select_next_item(),
+          ["<S-Tab>"] = cmp.mapping.select_prev_item(),
+          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        }),
+        sources = { { name = "nvim_lsp" } },
+      })
+    end
+  },
+
+  -- Treesitter
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        ensure_installed = { "c", "cpp", "lua", "make" },
+        highlight = { enable = true },
+      })
+    end
+  },
+
+  -- Status line
+  {
+    "nvim-lualine/lualine.nvim",
+    event = "VimEnter",
+    config = function()
+      require("lualine").setup {
+        options = {
+          icons_enabled = false,
+          theme = {
+            normal = {
+              a = { fg = '#000000', bg = '#FF75B5', gui = 'bold' },
+              b = { fg = '#DCD7BA', bg = '#000000' },
+              c = { fg = '#DCD7BA', bg = '#000000' },
+            },
+            insert = { a = { fg = '#000000', bg = '#7E9CD8', gui = 'bold' } },
+            visual = { a = { fg = '#000000', bg = '#D27E99', gui = 'bold' } },
+            replace = { a = { fg = '#000000', bg = '#FF9E3B', gui = 'bold' } },
+            command = { a = { fg = '#000000', bg = '#98BB6C', gui = 'bold' } },
+            inactive = {
+              a = { fg = '#7E7C9C', bg = '#000000' },
+              b = { fg = '#7E7C9C', bg = '#000000' },
+              c = { fg = '#7E7C9C', bg = '#000000' },
+            },
+          },
+          component_separators = { left = ' | ', right = ' | ' },
+          section_separators = { left = ' | ', right = ' | ' },
+          always_divide_middle = true,
+          always_show_tabline = true,
+        },
+        sections = {
+          lualine_a = {'mode'},
+          lualine_b = {'branch', 'diff', 'diagnostics'},
+          lualine_c = {'filename'},
+          lualine_x = {'encoding', 'filetype'},
+          lualine_y = {'progress'},
+          lualine_z = {'location'}
+        },
+        inactive_sections = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = {'filename'},
+          lualine_x = {'location'},
+          lualine_y = {},
+          lualine_z = {}
+        }
+      }
+    end
+  },
+
+  -- Autopairs
+  {
+	  "windwp/nvim-autopairs",
+	  event = "InsertEnter",
+	  config = function()
+		  require("nvim-autopairs").setup()
+	  end,
+  },
+
+  -- ToggleTerm (floating terminal)
+  {
+	  "akinsho/toggleterm.nvim",
+	  version = "*",
+	  event = "VeryLazy",
+	  config = function()
+		  require("toggleterm").setup({
+			  direction = "float",
+			  float_opts = {
+				  border = "double",
+				  width = 150,
+				  height = 40,
+				  winblend = 0,
+			  },
+		  })
+	  end,
+  },
+
+  -- LazyGit integration
+  {
+	  "kdheepak/lazygit.nvim",
+	  dependencies = { "nvim-lua/plenary.nvim" },
+	  cmd = { "LazyGit" },
+  },
+
+  -- Colorizer
+  {
+	  "NvChad/nvim-colorizer.lua",
+	  event = { "BufReadPost", "BufNewFile" },
+	  config = function()
+		  require("colorizer").setup({
+			  filetypes = { "*" },
+			  user_default_options = {
+				  RGB = true,
+				  RRGGBB = true,
+				  names = false,
+				  css = true,
+				  css_fn = true,
+				  mode = "background",
+			  },
+		  })
+	  end,
+  },
+
+  -- Comment.nvim
+  {
+	  "numToStr/Comment.nvim",
+	  config = function()
+		  require("Comment").setup()
+	  end,
+  },
+
+  -- File explorer: nvim-tree
+  {
+	  "nvim-tree/nvim-tree.lua",
+	  version = "*",
+	  cmd = { "NvimTreeToggle", "NvimTreeFocus" },
+	  config = function()
+		  require("nvim-tree").setup({
+			  view = {
+				  width = 35,
+				  side = "left",
+				  relativenumber = true,
+			  },
+			  renderer = {
+				  icons = {
+					  show = {
+						  git = true,
+						  folder = true,
+						  file = true,
+						  folder_arrow = true,
+					  },
+				  },
+			  },
+			  update_focused_file = {
+				  enable = true,
+				  update_cwd = true,
+			  },
+			  git = {
+				  enable = true,
+				  ignore = false,
+			  },
+		  })
+	  end,
+  },
 })
 
-vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
-
-vim.wo.number = true
-vim.wo.relativenumber = true
-
-vim.api.nvim_set_keymap('i', '"', '""<left>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('i', "'", "''<left>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap('i', '(', '()<left>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('i', '[', '[]<left>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('i', '{', '{}<left>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('i', '{<CR>', '{<CR>}<ESC>O', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('i', '{;<CR>', '{<CR>};<ESC>O', { noremap = true, silent = true })
-
-vim.o.tabstop = 4
-vim.o.shiftwidth = 4
-
-local cmp = require('cmp')
-
-cmp.setup({
-  sources = {
-    { name = 'nvim_lsp' },
-  },
-  mapping = {
-    ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-    ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
-    ['<C-y>'] = cmp.mapping.confirm({ select = false }),
-    ['<C-e>'] = cmp.mapping.abort(),
-    ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
-    ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-    ['<C-p>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-    ['<C-n>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-  },
-  snippet = {
-    expand = function(args)
-      require('luasnip').lsp_expand(args.body)
-    end,
-  },
-})
-
-
--- Set up key mapping for Ctrl + C to copy to system clipboard in visual mode
-vim.api.nvim_set_keymap('v', '<C-c>', '"+y<CR>', { noremap = true })
-
--- Always use block cursor in all modes
+-- BASIC SETTINGS
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.smartindent = true
+vim.opt.autoindent = true
+vim.opt.foldmethod = 'indent'
+vim.opt.foldlevel = 99
+vim.opt.termguicolors = true
 vim.o.guicursor = 'n-v-c:block-Cursor,i:block-Cursor,ve:block-Cursor,r-cr:block-Cursor,o:hor20-Cursor,sm:block-Cursor'
 
--- Function to comment out the selected block
-function CommentBlock()
-    -- Get the visual mode selection
-    local line1, col1 = unpack(vim.fn.getpos("'<"), 2, 3)
-    local line2, col2 = unpack(vim.fn.getpos("'>"), 2, 3)
-
-    -- Insert /* at the beginning of the block
-    vim.fn.append(line1 - 1, "/*")
-    -- Insert */ at the end of the block
-    vim.fn.append(line2 + 1, "*/")
-end
-
--- Map Ctrl+I in visual mode to comment out the selected block
-vim.api.nvim_set_keymap("v", "<C-i>", ":lua CommentBlock()<CR>", { noremap = true, silent = true })
-
--- Tabs
-
--- Function to map keys
-local function map(mode, lhs, rhs, opts)
-    local options = { noremap = true, silent = true }
-    if opts then
-        options = vim.tbl_extend('force', options, opts)
-    end
-    vim.api.nvim_set_keymap(mode, lhs, rhs, options)
-end
-
--- Move the current line down
-function MoveLineDown()
-    local current_line = vim.api.nvim_win_get_cursor(0)[1] -- Get current line number
-    if current_line == vim.api.nvim_buf_line_count(0) then
-        return -- Do nothing if it's the last line
-    end
-    vim.cmd("move +1")  -- Move line down
-    vim.cmd("normal! ==")  -- Auto-indent the moved line
-    vim.api.nvim_win_set_cursor(0, {current_line + 1, 0})  -- Move cursor down
-end
-
--- Move the current line up
-function MoveLineUp()
-    local current_line = vim.api.nvim_win_get_cursor(0)[1] -- Get current line number
-    if current_line == 1 then
-        return -- Do nothing if it's the first line
-    end
-    vim.cmd("move -2")  -- Move line up
-    vim.cmd("normal! ==")  -- Auto-indent the moved line
-    vim.api.nvim_win_set_cursor(0, {current_line - 1, 0})  -- Move cursor up
-end
-
--- Key mappings for normal mode
+-- BASIC KEYBINDS
+vim.g.mapleader = " "
+vim.keymap.set("n", "<leader>t", "<cmd>ToggleTerm<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>l", "<cmd>LazyGit<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>pf", "<cmd>NvimTreeFocus<CR>")
+vim.keymap.set("n", "<leader>pt", "<cmd>NvimTreeToggle<CR>")
+vim.api.nvim_set_keymap('v', '<C-c>', '"+y<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-Up>", ":lua MoveLineUp()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-Down>", ":lua MoveLineDown()<CR>", { noremap = true, silent = true })
-
--- Key mappings for visual mode (for moving selected lines)
-vim.api.nvim_set_keymap("v", "<C-Down>", ":move '>+1<CR>gv=gv", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-Up>", ":move '<-2<CR>gv=gv", { noremap = true, silent = true })
-
-
-
--- Enable folding based on indentation
-vim.opt.foldmethod = 'indent'
-
--- Set the initial fold level to 1
-vim.opt.foldlevel = 1
+vim.api.nvim_set_keymap("n", "<C-k>", ":tabnext<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<C-j>", ":tabprevious<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<C-t>', ':tabnew | :Ex<CR>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<C-w>', ':tabclose<CR>', {noremap = true, silent = true})
 
 
--- Map Ctrl+l to go to the next tab
-map('n', '<C-k>', ':tabnext<CR>')
+-- FUNCTIONS
+function MoveLineDown()
+	local current_line = vim.api.nvim_win_get_cursor(0)[1]
+	if current_line == vim.api.nvim_buf_line_count(0) then
+		return
+	end
+	vim.cmd("move +1")
+	vim.cmd("normal! ==")
+	vim.api.nvim_win_set_cursor(0, {current_line + 1, 0})
+end
 
--- Map Ctrl+h to go to the previous tab
-map('n', '<C-j>', ':tabprevious<CR>')
-
-
--- Map Ctrl+t to open a new tab and start netrw
-map('n', '<C-t>', ':tabnew | :Ex<CR>')
-
--- Map Ctrl+w to close the current tab
-map('n', '<C-w>', ':tabclose<CR>')
+function MoveLineUp()
+	local current_line = vim.api.nvim_win_get_cursor(0)[1]
+	if current_line == 1 then
+		return
+	end
+	vim.cmd("move -2")
+	vim.cmd("normal! ==")
+	vim.api.nvim_win_set_cursor(0, {current_line - 1, 0})
+end

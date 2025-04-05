@@ -66,9 +66,10 @@ static const char unknown_str[] = "n/a";
 
 static const struct arg args[] = {
     /* function format          argument */
-    {run_command, "[ %s]",
-     "awk -F'[][]' '/Left:/ { print $2 }' <(amixer sget Master)"},
-
-    {cpu_perc, "[CPU  %s%%]", NULL},
-    {datetime, "[ %s]", "%a %b %d %r"},
+    {run_command, " [VOL %s]",
+     "amixer get Master | egrep -o '[0-9]{1,3}%'"},
+	{ battery_perc, " [BAT: %s%%]", "BAT0" },
+    {cpu_perc, " [CPU %s%%]", NULL},
+    {datetime, " [%s]", "%a %b %d %r"},
 };
+
