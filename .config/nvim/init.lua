@@ -86,7 +86,44 @@ require("lazy").setup({
 
   {
 	  "williamboman/mason-lspconfig.nvim",
-	  dependencies = { "williamboman/mason.nvim", "neovim/nvim-lspconfig" },
+	  dependencies = {
+		  "williamboman/mason.nvim",
+		  "neovim/nvim-lspconfig",
+	  },
+	  config = function()
+		  require("mason-lspconfig").setup({
+			  ensure_installed = { "lua_ls", "clangd", "bashls", "pyright" },
+			  automatic_installation = true,
+		  })
+
+		  local lspconfig = require("lspconfig")
+		  local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+		  local servers = { "lua_ls", "clangd", "bashls", "pyright" }
+
+		  for _, server in ipairs(servers) do
+			  if server == "lua_ls" then
+				  lspconfig.lua_ls.setup({
+					  capabilities = capabilities,
+					  settings = {
+						  Lua = {
+							  runtime = { version = "LuaJIT" },
+							  diagnostics = { globals = { "vim" } },
+							  workspace = {
+								  library = vim.api.nvim_get_runtime_file("", true),
+								  checkThirdParty = false,
+							  },
+							  telemetry = { enable = false },
+						  },
+					  },
+				  })
+			  else
+				  lspconfig[server].setup({
+					  capabilities = capabilities,
+				  })
+			  end
+		  end
+	  end
   },
 
   -- Completion
