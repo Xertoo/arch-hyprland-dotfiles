@@ -66,10 +66,9 @@ static const char unknown_str[] = "n/a";
 
 static const struct arg args[] = {
     /* function format          argument */
-    {run_command, " [VOL %s]",
-     "amixer get Master | egrep -o '[0-9]{1,3}%'"},
-	{ battery_perc, " [BAT: %s%%]", "BAT0" },
-    {cpu_perc, " [CPU %s%%]", NULL},
-    {datetime, " [%s]", "%a %b %d %r"},
+    { run_command, " [VOL %s]", 
+      "wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{printf \"%d%%\", $2 * 100}'" },
+    { cpu_perc, " [CPU %s%%]", NULL },
+    { datetime, " [%s]", "%a %b %d %r" },
 };
 

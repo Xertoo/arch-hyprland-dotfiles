@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Bm437 Verite 8x16:pixelsize=16:antialias=true:autohint=true";
+static char *font = "Bm437 IBM VGA 8x16:pixelsize=16:antialias=false:autohint=true";
 static int borderpx = 10;
 
 /*
@@ -93,84 +93,76 @@ char *termname = "st-256color";
  */
 unsigned int tabspaces = 8;
 
-/*
- * OLD:
-// Terminal colors (16 first used in escape sequence)
-static const char *colorname[] = {
-	// 8 normal colors 
-	"black",
-	"red3",
-	"green3",
-	"yellow3",
-	"blue2",
-	"magenta3",
-	"cyan3",
-	"gray90",
+// /* Terminal colors (16 first used in escape sequence) */
+// static const char *colorname[] = {
+// 	/* 8 normal colors */
+// 	"black",
+// 	"red3",
+// 	"green3",
+// 	"yellow3",
+// 	"blue2",
+// 	"magenta3",
+// 	"cyan3",
+// 	"gray90",
+//
+// 	/* 8 bright colors */
+// 	"gray50",
+// 	"red",
+// 	"green",
+// 	"yellow",
+// 	"#5c5cff",
+// 	"magenta",
+// 	"cyan",
+// 	"white",
+//
+// 	[255] = 0,
+//
+// 	/* more colors can be added after 255 to use with DefaultXX */
+// 	"#cccccc",
+// 	"#555555",
+// 	"gray90", /* default foreground colour */
+// 	"black", /* default background colour */
+// };
 
-	// 8 bright colors
-	"gray50",
-	"red",
-	"green",
-	"yellow",
-	"#5c5cff",
-	"magenta",
-	"cyan",
-	"white",
+static const char *colorname[] = {
+	/* 8 normal colors */
+	"#000000", // black
+	"#c34043", // red
+	"#76946a", // green
+	"#c0a36e", // yellow
+	"#7e9cd8", // blue
+	"#957fb8", // magenta
+	"#6a9589", // cyan
+	"#DDDDDD", // white (light gray)
+
+	/* 8 bright colors */
+	"#424149", // bright black (gray)
+	"#e82424", // bright red
+	"#98bb6c", // bright green
+	"#e6c384", // bright yellow
+	"#7fb4ca", // bright blue
+	"#938aa9", // bright magenta
+	"#7aa89f", // bright cyan
+	"#DDDDDD", // bright white
 
 	[255] = 0,
 
-	// more colors can be added after 255 to use with DefaultXX
-	"#cccccc",
-	"#555555",
-	"gray90", /* default foreground colour 
-	"black", /* default background colour 
-};
-*/
+	/* more colors can be added after 255 to use with DefaultXX */
 
-static const char *colorname[] = {
-    /* Normal colors */
-    [0] = "#000000", /* black */
-    [1] = "#d9245d", /* dark red */
-    [2] = "#96ba2f", /* dark green */
-    [3] = "#d9245d", /* dark yellow */
-    [4] = "#02a9ea", /* dark blue */
-    [5] = "#8c173c", /* dark magenta */
-    [6] = "#05d9e8", /* dark cyan */
-    [7] = "#999999", /* gray */
-
-    /* Bright colors */
-    [8]  = "#555555", /* dark gray */
-    [9]  = "#ff2a6d", /* red */
-    [10] = "#bcea3b", /* green */
-    [11] = "#f0df33", /* yellow */
-    [12] = "#04acb8", /* cyan */
-    [13] = "#a61b47", /* magenta */
-    [14] = "#05d9e8", /* cyan */
-    [15] = "#c0c0c0", /* light gray */
-
-    /* 256 color definitions (optional) */
-    [256] = "#000000", /* background */
-    [257] = "#ffffff", /* foreground */
+ 	"#cccccc",
+ 	"#555555",
+	"#DDDDDD", // foreground
+	"#000000", // background
 };
 
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-
-/*
- * OLD:
 unsigned int defaultfg = 258;
 unsigned int defaultbg = 259;
 unsigned int defaultcs = 256;
 static unsigned int defaultrcs = 257;
-*/
-
-unsigned int defaultfg = 257;
-unsigned int defaultbg = 256;
-unsigned int defaultcs = 257;
-unsigned int defaultrcs = 256;
-
 
 /*
  * Default shape of cursor
@@ -214,8 +206,8 @@ static uint forcemousemod = ShiftMask;
  */
 static MouseShortcut mshortcuts[] = {
 	/* mask                 button   function        argument       release */
-	{ ShiftMask,            Button4, kscrollup,      {.i = 1} },
-	{ ShiftMask,            Button5, kscrolldown,    {.i = 1} },
+	{ ShiftMask,            Button4, kscrollup,      {.i = 5} },
+	{ ShiftMask,            Button5, kscrolldown,    {.i = 5} },
 	{ XK_ANY_MOD,           Button2, selpaste,       {.i = 0},      1 },
 	{ ShiftMask,            Button4, ttysend,        {.s = "\033[5;2~"} },
 	{ XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },

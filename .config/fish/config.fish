@@ -16,33 +16,50 @@ function fish_vi_cursor;
 end
 
 function fish_prompt
-    set_color red
     if test (id -u) -eq 0
-        printf "root@"
+		set_color normal
+        printf "[" $USER
+		set_color red
+        printf "root"
+		set_color normal
+        printf "@" $USER
     else
-        printf "%s@" $USER
+		set_color normal
+        printf "[" $USER
+		set_color blue
+        printf "%s" $USER
+		set_color normal
+        printf "@" $USER
     end
 
+    set_color yellow
+    printf "%s" (hostname -s)
     set_color normal
-    printf "%s " (hostname -s)
+    printf "]" (hostname -s)
 
-    set_color blue
-    printf "%s " (prompt_pwd)
+    set_color red
+    printf "["
+    printf "%s" (prompt_pwd)
+    printf "]"
 
     set_color normal
 	fish_vi_key_bindings
 	fish_vi_cursor
-    echo -n "> "
+    echo -n "\$ "
 end
 
 alias vim='nvim'
 alias nano='nvim'
-alias sudo='sudo '
+alias doas='doas '
 alias q='exit'
 alias lg='lazygit'
-alias pacin='sudo pacman -S'
-alias pacrm='sudo pacman -R'
-alias pacrma='sudo pacman -Rns'
+alias reboot='doas reboot'
+alias poweroff='doas poweroff'
 
 set -x MANPAGER "nvim +Man!"
+set -x NPM_CONFIG_PREFIX $HOME/.local
+set -x PATH $HOME/go/bin $HOME/.local/bin $NPM_CONFIG_PREFIX/bin $PATH
 
+#cd ~
+function fish_greeting; end
+export PATH="$HOME/.cargo/bin:$PATH"

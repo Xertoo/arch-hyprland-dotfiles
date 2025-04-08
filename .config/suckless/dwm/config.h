@@ -1,13 +1,18 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int gappx     = 6;        /* gaps between windows */
+static const unsigned int barpadv	= 10;		/* bar vertical padding (from top)*/
+static const unsigned int barpadh	= 300;		/* bar vertical padding (from top)*/
+static const unsigned int barheight	= 1;		/* bar vertical padding (from top)*/
+static const unsigned int barborder	= 2;		/* bar vertical padding (from top)*/
+static const unsigned int floatbar	= 1;		/* 0 means bar won't float; float or dock the bar */
 static const unsigned int snap      = 1;        /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "Terminus:size=10" };
-static const char dmenufont[]       = "Terminus:size=10";
+static const char *fonts[]          = { "Bm437 IBM VGA 8x16:pixelsize=16" };
+static const char dmenufont[]       = "Bm437 IBM VGA 8x16:pixelsize=16";
 static const char col_gray1[]       = "#000000";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -17,6 +22,7 @@ static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+	[SchemeBar] =  { col_gray3, col_gray1, col_cyan  },
 };
 
 /* tagging */
@@ -73,8 +79,6 @@ static const char *volupcmd[]   = { "wpctl", "set-volume", "-l", "1.0", "@DEFAUL
 static const char *voldowncmd[] = { "wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", "1%-", NULL };
 
 #include "movestack.c"
-#include <X11/XF86keysym.h>
-
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
@@ -123,9 +127,6 @@ static const Key keys[] = {
 
     { MODKEY,                       XK_x,      spawn,          {.v = volupcmd}},
     { MODKEY,                       XK_z,      spawn,          {.v = voldowncmd}},
-
-    /* Laptop specific binds */
-
 };
 
 /* button definitions */

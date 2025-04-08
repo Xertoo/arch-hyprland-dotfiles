@@ -311,6 +311,7 @@ require("lazy").setup({
 })
 
 -- BASIC SETTINGS
+vim.opt.guicursor = 'n-v-c:block-Cursor,i:block-Cursor,ve:block-Cursor,r-cr:block-Cursor,o:hor20-Cursor,sm:block-Cursor'
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.tabstop = 4
@@ -320,7 +321,6 @@ vim.opt.autoindent = true
 vim.opt.foldmethod = 'indent'
 vim.opt.foldlevel = 99
 vim.opt.termguicolors = true
-vim.o.guicursor = 'n-v-c:block-Cursor,i:block-Cursor,ve:block-Cursor,r-cr:block-Cursor,o:hor20-Cursor,sm:block-Cursor'
 
 -- BASIC KEYBINDS
 vim.g.mapleader = " "

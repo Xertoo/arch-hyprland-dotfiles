@@ -58,7 +58,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeBar }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
        NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
@@ -340,10 +340,10 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 		if (*y + *h + 2 * c->bw <= m->wy)
 			*y = m->wy;
 	}
-	if (*h < bh)
-		*h = bh;
-	if (*w < bh)
-		*w = bh;
+	if (*h < bh + barheight)
+		*h = bh + barheight;
+	if (*w < bh + barheight)
+		*w = bh + barheight;
 	if (resizehints || c->isfloating || !c->mon->lt[c->mon->sellt]->arrange) {
 		if (!c->hintsvalid)
 			updatesizehints(c);
@@ -565,13 +565,13 @@ configurenotify(XEvent *e)
 		sw = ev->width;
 		sh = ev->height;
 		if (updategeom() || dirty) {
-			drw_resize(drw, sw, bh);
+			drw_resize(drw, sw, bh + barheight);
 			updatebars();
 			for (m = mons; m; m = m->next) {
 				for (c = m->clients; c; c = c->next)
 					if (c->isfullscreen)
 						resizeclient(c, m->mx, m->my, m->mw, m->mh);
-				XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh);
+				XMoveResizeWindow(dpy, m->barwin, m->wx, m->by, m->ww, bh + barheight);
 			}
 			focus(NULL);
 			arrange(NULL);
@@ -700,54 +700,57 @@ dirtomon(int dir)
 void
 drawbar(Monitor *m)
 {
-	int x, w, tw = 0;
-	int boxs = drw->fonts->h / 9;
-	int boxw = drw->fonts->h / 6 + 2;
-	unsigned int i, occ = 0, urg = 0;
-	Client *c;
+    int x, w, tw = 0;
+    int boxs = drw->fonts->h / 9;
+    int boxw = drw->fonts->h / 6 + 2;
+    unsigned int i, occ = 0, urg = 0;
+    Client *c;
+    
+    // Calculate the actual bar width depending on if it's floating
+    int barwidth = floatbar ? (m->ww - 2 * barpadh) : m->ww;
 
-	if (!m->showbar)
-		return;
+    if (!m->showbar)
+        return;
 
-	/* draw status first so it can be overdrawn by tags later */
-	if (m == selmon) { /* status is only drawn on selected monitor */
-		drw_setscheme(drw, scheme[SchemeNorm]);
-		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
-		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
-	}
+    /* draw status first so it can be overdrawn by tags later */
+    if (m == selmon) { /* status is only drawn on selected monitor */
+        drw_setscheme(drw, scheme[SchemeNorm]);
+        tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
+        drw_text(drw, barwidth - tw, 0, tw, bh + barheight, 0, stext, 0);
+    }
 
-	for (c = m->clients; c; c = c->next) {
-		occ |= c->tags;
-		if (c->isurgent)
-			urg |= c->tags;
-	}
-	x = 0;
-	for (i = 0; i < LENGTH(tags); i++) {
-		w = TEXTW(tags[i]);
-		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
-		if (occ & 1 << i)
-			drw_rect(drw, x + boxs, boxs, boxw, boxw,
-				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
-				urg & 1 << i);
-		x += w;
-	}
-	w = TEXTW(m->ltsymbol);
-	drw_setscheme(drw, scheme[SchemeNorm]);
-	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+    for (c = m->clients; c; c = c->next) {
+        occ |= c->tags;
+        if (c->isurgent)
+            urg |= c->tags;
+    }
+    x = 0;
+    for (i = 0; i < LENGTH(tags); i++) {
+        w = TEXTW(tags[i]);
+        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+        drw_text(drw, x, 0, w, bh + barheight, lrpad / 2, tags[i], urg & 1 << i);
+        if (occ & 1 << i)
+            drw_rect(drw, x + boxs, boxs, boxw, boxw,
+                m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
+                urg & 1 << i);
+        x += w;
+    }
+    w = TEXTW(m->ltsymbol);
+    drw_setscheme(drw, scheme[SchemeNorm]);
+    x = drw_text(drw, x, 0, w, bh + barheight, lrpad / 2, m->ltsymbol, 0);
 
-	if ((w = m->ww - tw - x) > bh) {
-		if (m->sel) {
-			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
-			if (m->sel->isfloating)
-				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
-		} else {
-			drw_setscheme(drw, scheme[SchemeNorm]);
-			drw_rect(drw, x, 0, w, bh, 1, 1);
-		}
-	}
-	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
+    if ((w = barwidth - tw - x) > bh + barheight) {
+        if (m->sel) {
+            drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+            drw_text(drw, x, 0, w, bh + barheight, lrpad / 2, m->sel->name, 0);
+            if (m->sel->isfloating)
+                drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
+        } else {
+            drw_setscheme(drw, scheme[SchemeNorm]);
+            drw_rect(drw, x, 0, w, bh + barheight, 1, 1);
+        }
+    }
+    drw_map(drw, m->barwin, 0, 0, barwidth, bh + barheight);
 }
 
 void
@@ -1174,7 +1177,7 @@ movemouse(const Arg *arg)
 			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
-			if ((ev.xmotion.time - lasttime) <= (1000 / 60))
+			if ((ev.xmotion.time - lasttime) <= (1000 / 144))
 				continue;
 			lasttime = ev.xmotion.time;
 
@@ -1328,7 +1331,7 @@ resizemouse(const Arg *arg)
 			handler[ev.type](&ev);
 			break;
 		case MotionNotify:
-			if ((ev.xmotion.time - lasttime) <= (1000 / 60))
+			if ((ev.xmotion.time - lasttime) <= (1000 / 144))
 				continue;
 			lasttime = ev.xmotion.time;
 
@@ -1574,7 +1577,7 @@ setup(void)
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
-	bh = drw->fonts->h + 2;
+	bh = drw->fonts->h + 2 + barheight;
 	updategeom();
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
@@ -1699,29 +1702,29 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 {
-    unsigned int i, n, h, mw, my, ty;
-    Client *c;
+	unsigned int i, n, h, mw, my, ty;
+	Client *c;
 
-    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-    if (n == 0)
-        return;
+	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+	if (n == 0)
+		return;
 
-    if (n > m->nmaster)
-        mw = m->nmaster ? m->ww * m->mfact : 0;
-    else
-        mw = m->ww - m->gappx;
-    for (i = 0, my = ty = m->gappx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-        if (i < m->nmaster) {
-            h = (m->wh - my) / (MIN(n, m->nmaster) - i) - m->gappx;
-            resize(c, m->wx + m->gappx, m->wy + my, mw - (2*c->bw) - m->gappx, h - (2*c->bw), 0);
-            if (my + HEIGHT(c) + m->gappx < m->wh)
-                my += HEIGHT(c) + m->gappx;
-        } else {
-            h = (m->wh - ty) / (n - i) - m->gappx;
-            resize(c, m->wx + mw + m->gappx, m->wy + ty, m->ww - mw - (2*c->bw) - 2*m->gappx, h - (2*c->bw), 0);
-            if (ty + HEIGHT(c) + m->gappx < m->wh)
-                ty += HEIGHT(c) + m->gappx;
-        }
+	if (n > m->nmaster)
+		mw = m->nmaster ? m->ww * m->mfact : 0;
+	else
+		mw = m->ww - m->gappx;
+	for (i = 0, my = ty = m->gappx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+		if (i < m->nmaster) {
+			h = (m->wh - my) / (MIN(n, m->nmaster) - i) - m->gappx;
+			resize(c, m->wx + m->gappx, m->wy + my, mw - (2*c->bw) - m->gappx, h - (2*c->bw), 0);
+			if (my + HEIGHT(c) + m->gappx < m->wh)
+				my += HEIGHT(c) + m->gappx;
+		} else {
+			h = (m->wh - ty) / (n - i) - m->gappx;
+			resize(c, m->wx + mw + m->gappx, m->wy + ty, m->ww - mw - (2*c->bw) - 2*m->gappx, h - (2*c->bw), 0);
+			if (ty + HEIGHT(c) + m->gappx < m->wh)
+				ty += HEIGHT(c) + m->gappx;
+		}
 }
 
 void
@@ -1729,7 +1732,7 @@ togglebar(const Arg *arg)
 {
 	selmon->showbar = !selmon->showbar;
 	updatebarpos(selmon);
-	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
+	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh + barheight);
 	arrange(selmon);
 }
 
@@ -1830,36 +1833,50 @@ unmapnotify(XEvent *e)
 void
 updatebars(void)
 {
-	Monitor *m;
-	XSetWindowAttributes wa = {
-		.override_redirect = True,
-		.background_pixmap = ParentRelative,
-		.event_mask = ButtonPressMask|ExposureMask
-	};
-	XClassHint ch = {"dwm", "dwm"};
-	for (m = mons; m; m = m->next) {
-		if (m->barwin)
-			continue;
-		m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, DefaultDepth(dpy, screen),
-				CopyFromParent, DefaultVisual(dpy, screen),
-				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
-		XDefineCursor(dpy, m->barwin, cursor[CurNormal]->cursor);
-		XMapRaised(dpy, m->barwin);
-		XSetClassHint(dpy, m->barwin, &ch);
-	}
+    Monitor *m;
+    XSetWindowAttributes wa = {
+        .override_redirect = True,
+        .background_pixmap = ParentRelative,
+        .event_mask = ButtonPressMask|ExposureMask
+    };
+    XClassHint ch = {"dwm", "dwm"};
+    for (m = mons; m; m = m->next) {
+        if (m->barwin)
+            continue;
+        if (floatbar) {
+            m->barwin = XCreateWindow(dpy, root, barpadh, barpadv, m->ww - 2 * barpadh, bh + barheight, 0, DefaultDepth(dpy, screen),
+                                      CopyFromParent, DefaultVisual(dpy, screen),
+                                      CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
+			XSetWindowBorder(dpy, m->barwin, scheme[SchemeBar][ColBorder].pixel);
+			XSetWindowBorderWidth(dpy, m->barwin, barborder);
+        } else {
+            m->barwin = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh + barheight, 0, DefaultDepth(dpy, screen),
+                                      CopyFromParent, DefaultVisual(dpy, screen),
+                                      CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
+        }
+        XDefineCursor(dpy, m->barwin, cursor[CurNormal]->cursor);
+        XMapRaised(dpy, m->barwin);
+        XSetClassHint(dpy, m->barwin, &ch);
+    }
 }
 
 void
 updatebarpos(Monitor *m)
 {
-	m->wy = m->my;
-	m->wh = m->mh;
-	if (m->showbar) {
-		m->wh -= bh;
-		m->by = m->topbar ? m->wy : m->wy + m->wh;
-		m->wy = m->topbar ? m->wy + bh : m->wy;
-	} else
-		m->by = -bh;
+    if (floatbar) {
+        m->wy = m->my + (bh + barpadv * 2 + barborder - 4); /* Start window area below the bar */
+        m->wh = m->mh - (bh + barpadv * 2 + barborder - 4); /* Reduce window height to account for bar */
+        m->by = barpadv;                                 /* Position bar at vertical padding from top */
+    } else {
+        m->wy = m->my;
+        m->wh = m->mh;
+        if (m->showbar) {
+            m->wh -= bh + barheight;
+            m->by = m->topbar ? m->wy : m->wy + m->wh;
+            m->wy = m->topbar ? m->wy + bh + barheight : m->wy;
+        } else
+            m->by = -bh + barheight;
+    }
 }
 
 void

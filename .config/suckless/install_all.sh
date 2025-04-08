@@ -7,7 +7,7 @@ RESET='\033[0m'
 
 # DWM
 cd "$CURRPATH/dwm"
-sudo make clean install
+doas make clean install
 echo ""
 echo ""
 printf "${GREEN_BG}INSTALLED DWM${RESET}\n"
@@ -16,7 +16,7 @@ echo ""
 cd ..
 
 cd "$CURRPATH/st"
-sudo make clean install
+doas make clean install
 echo ""
 echo ""
 printf "${GREEN_BG}INSTALLED ST${RESET}\n"
@@ -25,7 +25,7 @@ echo ""
 cd ..
 
 cd "$CURRPATH/slstatus"
-sudo make clean install
+doas make clean install
 echo ""
 echo ""
 printf "${GREEN_BG}INSTALLED SLSTATUS${RESET}\n"
@@ -34,7 +34,7 @@ echo ""
 cd ..
 
 cd "$CURRPATH/dmenu"
-sudo make clean install
+doas make clean install
 echo ""
 echo ""
 printf "${GREEN_BG}INSTALLED DMENU${RESET}\n"
