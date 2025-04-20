@@ -1,9 +1,9 @@
 /* change these variables to get different colors */
 #tabbrowser-tabs {
-	--tab-active-color: #005577;
-	--tab-inactive-color: #333333;
+	--tab-active-color: #c0cbff;
+	--tab-inactive-color: #000000;
 	--tab-fallback-color-active: #ffffff;
-	--tab-fallback-color-inactive: #888888;
+	--tab-fallback-color-inactive: #000000;
 }
 
 /* change to control tabbar height */
@@ -45,9 +45,9 @@
 	display: none;
 }
 
-#downloads-button {
-	display: none;
-}
+/* #downloads-button { */
+/* 	display: none; */
+/* } */
 
 #library-button {
 	display: none;
@@ -234,7 +234,7 @@ tab:only-of-type {
 */
 
 /* Hide close button on tabs */
-#tabbrowser-tabs .tabbrowser-tab .tab-close-button {
+#tabbrowser-tabj .tabbrowser-tab .tab-close-button {
 	display: none !important;
 }
 
@@ -265,31 +265,25 @@ tab:only-of-type {
 	min-height: 0 !important;
 }
 
-/*
- * Tab: selected colors
 #tabbrowser-tabs .tabbrowser-tab[selected] .tab-content {
 	background: var(--tab-active-color) !important;
+	color: black !important;
 	border: none !important;
-	color: var(--identity-icon-color, --tab-fallback-color-active) !important;
-}
-*/
-
-#tabbrowser-tabs .tabbrowser-tab[selected] .tab-content {
-	background: linear-gradient(to bottom, #005577, #003355) !important;
-	border: none !important;
-	color: var(--identity-icon-color, var(--tab-fallback-color-active)) !important;
 }
 
-/*
- * Tab: hovered colors
+/* #tabbrowser-tabs .tabbrowser-tab[selected] .tab-content { */
+/* 	background: linear-gradient(to bottom, #005577, #003355) !important; */
+/* 	border: none !important; */
+/* 	color: var(--identity-icon-color, var(--tab-fallback-color-active)) !important; */
+/* } */
+
 #tabbrowser-tabs .tabbrowser-tab:hover:not([selected]) .tab-content {
 	background: var(--tab-active-color) !important;
+	color: black !important;
 }
-*/
-
-#tabbrowser-tabs .tabbrowser-tab:hover:not([selected]) .tab-content {
-	background: linear-gradient(to bottom, #005577, #003355) !important;
-}
+/* #tabbrowser-tabs .tabbrowser-tab:hover:not([selected]) .tab-content { */
+/* 	background: linear-gradient(to bottom, #005577, #003355) !important; */
+/* } */
 
 /* remove white margin around active tabs */
 #tabbrowser-tabs:not([movingtab])>#tabbrowser-arrowscrollbox>.tabbrowser-tab[beforeselected-visible]::after,
