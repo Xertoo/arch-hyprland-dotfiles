@@ -59,6 +59,8 @@ alias poweroff='doas poweroff'
 set -x MANPAGER "nvim +Man!"
 set -x NPM_CONFIG_PREFIX $HOME/.local
 set -x PATH $HOME/go/bin $HOME/.local/bin $NPM_CONFIG_PREFIX/bin $PATH
+set -gx PATH $HOME/bin $PATH
+
 
 #cd ~
 function fish_greeting; end

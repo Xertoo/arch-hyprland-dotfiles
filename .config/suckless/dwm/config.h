@@ -1,8 +1,8 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 2;        /* border pixel of windows */
-static const unsigned int gappx     = 6;        /* gaps between windows */
+static const unsigned int borderpx  = 4;        /* border pixel of windows */
+static const unsigned int gappx     = 40;        /* gaps between windows */
 static const unsigned int barpadv	= 10;		/* bar vertical padding (from top)*/
 static const unsigned int barpadh	= 300;		/* bar vertical padding (from top)*/
 static const unsigned int barheight	= 1;		/* bar vertical padding (from top)*/
@@ -22,7 +22,7 @@ static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
-	[SchemeBar] =  { col_gray3, col_gray1, col_cyan  },
+	[SchemeBar] =  { col_gray4, col_cyan, col_cyan  },
 };
 
 /* tagging */
@@ -84,7 +84,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,	   spawn,          {.v = firefox } },
-//	{ MODKEY,                       XK_b,      togglebar,      {0} },
+	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
