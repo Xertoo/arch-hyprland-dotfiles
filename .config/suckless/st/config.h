@@ -5,7 +5,8 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Bm437 IBM VGA 8x16:pixelsize=16:antialias=false:autohint=true";
+/* static char *font = "Bm437 IBM VGA 8x16:pixelsize=16:antialias=false:autohint=true"; */
+static char *font = "terminus:pixelsize=17:antialias=false:autohint=true";
 static int borderpx = 10;
 
 /*
@@ -93,7 +94,7 @@ char *termname = "st-256color";
  */
 unsigned int tabspaces = 8;
 /* bg opacity */
-float alpha = 0.5;
+float alpha = 0;
 
 // /* Terminal colors (16 first used in escape sequence) */
 // static const char *colorname[] = {
@@ -126,45 +127,104 @@ float alpha = 0.5;
 // 	"black", /* default background colour */
 // };
 
+// static const char *colorname[] = {
+// 	/* 8 normal colors */
+// 	"#000000", // black
+// 	"#c34043", // red
+// 	"#76946a", // green
+// 	"#c0a36e", // yellow
+// 	"#7e9cd8", // blue
+// 	"#957fb8", // magenta
+// 	"#6a9589", // cyan
+// 	"#DDDDDD", // white (light gray)
+//
+// 	/* 8 bright colors */
+// 	"#424149", // bright black (gray)
+// 	"#e82424", // bright red
+// 	"#98bb6c", // bright green
+// 	"#e6c384", // bright yellow
+// 	"#7fb4ca", // bright blue
+// 	"#938aa9", // bright magenta
+// 	"#7aa89f", // bright cyan
+// 	"#DDDDDD", // bright white
+//
+// 	[255] = 0,
+//
+// 	/* more colors can be added after 255 to use with DefaultXX */
+//
+//  	"#cccccc",
+//  	"#555555",
+// 	"#DDDDDD", // foreground
+// 	"#000000", // background
+// };
+
+// /* Paper Color Light */
+// static const char *colorname[] = {
+// 	/* 8 normal colors */
+// 	"#eeeeee", // black (paper white)
+// 	"#af0000", // red
+// 	"#008700", // green
+// 	"#5f8700", // yellow-green
+// 	"#0087af", // blue
+// 	"#878787", // magenta (gray)
+// 	"#005f87", // cyan (paper blue)
+// 	"#444444", // white (main text)
+//
+// 	/* 8 bright colors */
+// 	"#bcbcbc", // bright black (light gray)
+// 	"#d70000", // bright red
+// 	"#d70087", // bright magenta
+// 	"#8700af", // purple
+// 	"#d75f00", // orange
+// 	"#d75f00", // orange again
+// 	"#005faf", // blue alt
+// 	"#005f87", // reused blue
+//
+// 	[255] = 0,
+//
+// 	/* extra colors used for defaults */
+// 	"#444444", // foreground (main text)
+// 	"#eeeeee", // background (light paper!)
+// 	"#005f87", // cursor
+// 	"#eeeeee", // reverse cursor
+// };
+
+/* Gruvbox Dark */
 static const char *colorname[] = {
 	/* 8 normal colors */
-	"#000000", // black
-	"#c34043", // red
-	"#76946a", // green
-	"#c0a36e", // yellow
-	"#7e9cd8", // blue
-	"#957fb8", // magenta
-	"#6a9589", // cyan
-	"#DDDDDD", // white (light gray)
+	"#282828", // black (background)
+	"#cc241d", // red
+	"#98971a", // green
+	"#d79921", // yellow
+	"#458588", // blue
+	"#b16286", // magenta
+	"#689d6a", // cyan
+	"#a89984", // white (light gray)
 
 	/* 8 bright colors */
-	"#424149", // bright black (gray)
-	"#e82424", // bright red
-	"#98bb6c", // bright green
-	"#e6c384", // bright yellow
-	"#7fb4ca", // bright blue
-	"#938aa9", // bright magenta
-	"#7aa89f", // bright cyan
-	"#DDDDDD", // bright white
+	"#928374", // bright black (dark gray)
+	"#fb4934", // bright red
+	"#b8bb26", // bright green
+	"#fabd2f", // bright yellow
+	"#83a598", // bright blue
+	"#d3869b", // bright magenta
+	"#8ec07c", // bright cyan
+	"#ebdbb2", // bright white
 
 	[255] = 0,
 
-	/* more colors can be added after 255 to use with DefaultXX */
-
- 	"#cccccc",
- 	"#555555",
-	"#DDDDDD", // foreground
-	"#000000", // background
+	/* extra colors used for defaults */
+	"#ebdbb2", // foreground (light text)
+	"#211d1d", // background (dark background)
+	"#d79921", // cursor (yellow)
+	"#282828", // reverse cursor
 };
 
-/*
- * Default colors (colorname index)
- * foreground, background, cursor, reverse cursor
- */
-unsigned int defaultfg = 258;
-unsigned int defaultbg = 259;
-unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
+/* Default colors (colorname index) */
+unsigned int defaultfg = 256;  // #444444
+unsigned int defaultbg = 257;  // #eeeeee (this was your bug!)
+unsigned int defaultcs = 258;  // #005f87
+static unsigned int defaultrcs = 259; // #eeeeee
 
 /*
  * Default shape of cursor

@@ -1,396 +1,236 @@
--- BOOTSTRAP lazy.nvim
+-- Set <leader> to space (must be first)
+vim.g.mapleader = " "
+
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system({
 		"git", "clone", "--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath
+		"https://github.com/folke/lazy.nvim.git", lazypath
 	})
 end
 vim.opt.rtp:prepend(lazypath)
 
--- SETUP PLUGINS
 require("lazy").setup({
-	-- Lazy.nvim
-	{
-		"folke/lazy.nvim",
-	},
+	-- LSP + Autocomplete + Snippets
+	"neovim/nvim-lspconfig",
+	"hrsh7th/nvim-cmp",
+	"hrsh7th/cmp-nvim-lsp",
+	"L3MON4D3/LuaSnip",
+	"saadparwaiz1/cmp_luasnip",
 
-	-- Kanagawa colorscheme
-	{
-		"rebelot/kanagawa.nvim",
-		priority = 1000,
-		config = function()
-			require("kanagawa").setup({
-				compile = false,
-				undercurl = true,
-				commentStyle = { italic = true },
-				functionStyle = { bold = true },
-				keywordStyle = { italic = true, bold = true },
-				statementStyle = { bold = true },
-				typeStyle = { bold = true },
-				transparent = true,
-				dimInactive = false,
-				terminalColors = true,
-				colors = {
-					palette = {
-						sumiInk0 = "none",
-					},
-					theme = {
-						dragon = {
-							ui = {
-								bg = "none",
-								bg_p1 = "none",
-								float = "none",
-							},
-							syn = {
-								string = "#00FF87",
-								functionName = "#80FFFF",
-								keyword = "#FF75B5",
-								statement = "#FFB86C",
-							},
-						},
-					},
-				},
-				overrides = function(colors)
-					return {
-						Normal = { bg = "none" },
-						NormalNC = { bg = "none" },
-						NormalFloat = { bg = "none" },
-						FloatBorder = { bg = "none" },
-						TelescopeNormal = { bg = "none" },
-						Comment = { fg = colors.palette.oniViolet, italic = true },
-						Function = { fg = "#80FFFF", bold = true },
-						Keyword = { fg = "#FF75B5", bold = true, italic = true },
-						String = { fg = "#00FF87" },
-						Statement = { fg = "#FFB86C", bold = true },
-					}
-				end,
-				theme = "dragon",
-				background = {
-					dark = "dragon",
-					light = "lotus"
-				},
-			})
-			vim.cmd("colorscheme kanagawa-dragon")
-		end
-	},
+	-- Syntax highlighting
+	{ "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
 
-	-- LSP with Mason
+	-- Telescope
+	"nvim-telescope/telescope.nvim",
+	"nvim-lua/plenary.nvim",
+
+	-- Statusline
+	"nvim-lualine/lualine.nvim",
+
+	-- Which-key for easy binds
+	"folke/which-key.nvim",
+
+	-- Debugger
+	"mfussenegger/nvim-dap",
+
+	-- Theme
 	{
-		"williamboman/mason.nvim",
-		build = ":MasonUpdate",
+		"vague2k/vague.nvim",
 		config = function()
-			require("mason").setup()
+			require("vague").setup()
 		end,
 	},
 
 	{
-		"williamboman/mason-lspconfig.nvim",
-		dependencies = {
-			"williamboman/mason.nvim",
-			"neovim/nvim-lspconfig",
+		"ellisonleao/gruvbox.nvim",
+		priority = 1000,
+		opts = {
+			terminal_colors = true,
+			undercurl = true,
+			underline = true,
+			bold = true,
+			italic = {
+				strings = false,
+				comments = true,
+				operators = false,
+				folds = true,
+			},
+			contrast = "hard", -- use "hard" for #1d2021
+			palette_overrides = {},
+			overrides = {},
+			dim_inactive = false,
+			transparent_mode = false,
 		},
 		config = function()
-			local languageservers = { "lua_ls", "clangd", "bashls", "pyright" }
-			require("mason-lspconfig").setup({
-				ensure_installed = languageservers,
-				automatic_installation = true,
-			})
-
-			local lspconfig = require("lspconfig")
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			local servers = languageservers
-
-			for _, server in ipairs(servers) do
-				if server == "lua_ls" then
-					lspconfig.lua_ls.setup({
-						capabilities = capabilities,
-						settings = {
-							Lua = {
-								runtime = { version = "LuaJIT" },
-								diagnostics = { globals = { "vim" } },
-								workspace = {
-									library = vim.api.nvim_get_runtime_file("", true),
-									checkThirdParty = false,
-								},
-								telemetry = { enable = false },
-							},
-						},
-					})
-				else
-					lspconfig[server].setup({
-						capabilities = capabilities,
-						on_attach = on_attach,
-					})
-				end
-			end
-		end
+			vim.cmd("colorscheme gruvbox")
+			vim.opt.background = "dark"
+		end,
 	},
 
-	-- Completion
-	{
-		"hrsh7th/nvim-cmp",
-		event = "InsertEnter",
-		dependencies = {
-			"hrsh7th/cmp-nvim-lsp",
-			"L3MON4D3/LuaSnip",
-		},
-		config = function()
-			local cmp = require("cmp")
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						require("luasnip").lsp_expand(args.body)
-					end,
-				},
-				mapping = cmp.mapping.preset.insert({
-					["<Tab>"] = cmp.mapping.select_next_item(),
-					["<S-Tab>"] = cmp.mapping.select_prev_item(),
-					["<CR>"] = cmp.mapping.confirm({ select = true }),
-				}),
-				sources = { { name = "nvim_lsp" } },
-			})
-		end
-	},
-
-	-- Treesitter
-	{
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		event = { "BufReadPost", "BufNewFile" },
-		config = function()
-			require("nvim-treesitter.configs").setup({
-				ensure_installed = { "c", "cpp", "lua", "make" },
-				highlight = { enable = true },
-			})
-		end
-	},
-
-	-- Status line
-	{
-		"nvim-lualine/lualine.nvim",
-		event = "VimEnter",
-		config = function()
-			require("lualine").setup {
-				options = {
-					icons_enabled = false,
-					theme = {
-						normal = {
-							a = { fg = '#000000', bg = '#FF75B5', gui = 'bold' },
-							b = { fg = '#DCD7BA', bg = 'none' },
-							c = { fg = '#DCD7BA', bg = 'none' },
-						},
-						insert = { a = { fg = '#000000', bg = '#7E9CD8', gui = 'bold' } },
-						visual = { a = { fg = '#000000', bg = '#D27E99', gui = 'bold' } },
-						replace = { a = { fg = '#000000', bg = '#FF9E3B', gui = 'bold' } },
-						command = { a = { fg = '#000000', bg = '#98BB6C', gui = 'bold' } },
-						inactive = {
-							a = { fg = '#7E7C9C', bg = '#000000' },
-							b = { fg = '#7E7C9C', bg = '#000000' },
-							c = { fg = '#7E7C9C', bg = '#000000' },
-						},
-					},
-					component_separators = { left = ' | ', right = ' | ' },
-					section_separators = { left = ' | ', right = ' | ' },
-					always_divide_middle = true,
-					always_show_tabline = true,
-				},
-				sections = {
-					lualine_a = {'mode'},
-					lualine_b = {'branch', 'diff', 'diagnostics'},
-					lualine_c = {'filename'},
-					lualine_x = {'encoding', 'filetype'},
-					lualine_y = {'progress'},
-					lualine_z = {'location'}
-				},
-				inactive_sections = {
-					lualine_a = {},
-					lualine_b = {},
-					lualine_c = {'filename'},
-					lualine_x = {'location'},
-					lualine_y = {},
-					lualine_z = {}
-				}
-			}
-		end
-	},
 
 	-- Autopairs
-	{
-		"windwp/nvim-autopairs",
-		event = "InsertEnter",
-		config = function()
-			require("nvim-autopairs").setup()
-		end,
-	},
-
-	-- ToggleTerm (floating terminal)
-	{
-		"akinsho/toggleterm.nvim",
-		version = "*",
-		event = "VeryLazy",
-		config = function()
-			require("toggleterm").setup({
-				direction = "float",
-				float_opts = {
-					border = "double",
-					width = 150,
-					height = 40,
-					winblend = 0,
-				},
-			})
-		end,
-	},
-
-	-- LazyGit integration
-	{
-		"kdheepak/lazygit.nvim",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		cmd = { "LazyGit" },
-	},
-
-	-- Colorizer
-	{
-		"NvChad/nvim-colorizer.lua",
-		event = { "BufReadPost", "BufNewFile" },
-		config = function()
-			require("colorizer").setup({
-				filetypes = { "*" },
-				user_default_options = {
-					RGB = true,
-					RRGGBB = true,
-					names = false,
-					css = true,
-					css_fn = true,
-					mode = "background",
-				},
-			})
-		end,
-	},
-
-	-- Comment.nvim
-	{
-		"numToStr/Comment.nvim",
-		config = function()
-			require("Comment").setup()
-		end,
-	},
-
-	-- File explorer: nvim-tree
-	{
-		"nvim-tree/nvim-tree.lua",
-		version = "*",
-		cmd = { "NvimTreeToggle", "NvimTreeFocus" },
-		config = function()
-			require("nvim-tree").setup({
-				view = {
-					width = 35,
-					side = "left",
-					relativenumber = true,
-				},
-				renderer = {
-					icons = {
-						show = {
-							git = true,
-							folder = true,
-							file = true,
-							folder_arrow = true,
-						},
-					},
-				},
-				update_focused_file = {
-					enable = true,
-					update_cwd = true,
-				},
-				git = {
-					enable = true,
-					ignore = false,
-				},
-			})
-		end,
-	},
-
-	-- LSP Signature
-	{
-		"ray-x/lsp_signature.nvim",
-		event = "VeryLazy",
-		config = function()
-			require("lsp_signature").setup({
-				bind = true,
-				floating_window = true,
-				hint_enable = false,
-				handler_opts = {
-					border = "rounded"
-				},
-				floating_window_above_cur_line = true, -- show above the current line
-			})
-		end
-	},
-
+	"windwp/nvim-autopairs",
 })
 
--- BASIC SETTINGS
-vim.opt.guicursor = 'n-v-c:block-Cursor,i:block-Cursor,ve:block-Cursor,r-cr:block-Cursor,o:hor20-Cursor,sm:block-Cursor'
-vim.opt.number = true
-vim.opt.relativenumber = true
+-- === GENERAL OPTIONS ===
+vim.o.number = true
+vim.o.relativenumber = true
+vim.o.termguicolors = true
+vim.o.signcolumn = "yes"
+
+-- === LSP SETUP ===
+require("lspconfig").clangd.setup({})
+
+-- === Autocomplete ===
+local cmp = require("cmp")
+cmp.setup({
+	mapping = cmp.mapping.preset.insert({
+		['<Tab>'] = function(fallback)
+			if cmp.visible() then
+				cmp.select_next_item()
+			elseif require("luasnip").expand_or_jumpable() then
+				require("luasnip").expand_or_jump()
+			else
+				fallback()
+			end
+		end,
+		['<S-Tab>'] = function(fallback)
+			if cmp.visible() then
+				cmp.select_prev_item()
+			elseif require("luasnip").jumpable(-1) then
+				require("luasnip").jump(-1)
+			else
+				fallback()
+			end
+		end,
+		['<CR>'] = cmp.mapping.confirm({ select = true }),
+	}),
+	sources = {
+		{ name = 'nvim_lsp' },
+		{ name = 'luasnip' },
+	},
+})
+
+-- === Treesitter ===
+require("nvim-treesitter.configs").setup {
+	ensure_installed = { "c", "lua", "vim", "bash" },
+	highlight = { enable = true },
+}
+
+-- === Statusline ===
+require("lualine").setup {
+	options = {
+		theme = "auto",
+		component_separators = "",
+		section_separators = "",
+	}
+}
+
+-- === Which-Key ===
+require("which-key").setup()
+
+-- === nvim-dap: Debugger ===
+local dap = require("dap")
+dap.adapters.lldb = {
+	type = "executable",
+	command = "lldb-vscode",
+	name = "lldb"
+}
+dap.configurations.c = {
+	{
+		name = "Launch file",
+		type = "lldb",
+		request = "launch",
+		program = function()
+			return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+		end,
+		cwd = '${workspaceFolder}',
+		stopOnEntry = false,
+		args = {},
+	},
+}
+vim.keymap.set("n", "<F5>", function() require("dap").continue() end)
+
+-- === Diagnostic Setup with Sign Icons ===
+vim.diagnostic.config({
+	virtual_text = false,
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
+})
+
+local signs = {
+	{ name = "DiagnosticSignError", text = "" },
+	{ name = "DiagnosticSignWarn",  text = "" },
+	{ name = "DiagnosticSignHint",  text = "" },
+	{ name = "DiagnosticSignInfo",  text = "" },
+}
+
+for _, sign in ipairs(signs) do
+	vim.fn.sign_define(sign.name, {
+		text = sign.text,
+		texthl = sign.name,
+		linehl = "",
+		numhl = "",
+	})
+end
+
+-- === Cursor Hover Diagnostic Float with Wrapping ===
+vim.keymap.set("n", "K", function()
+	local opts = {
+		focusable = false,
+		border = "rounded",
+		source = "always",
+		prefix = "",
+		scope = "cursor"
+	}
+	local float_win = vim.diagnostic.open_float(nil, opts)
+	if float_win then vim.wo.wrap = true end
+end, { desc = "Show wrapped diagnostic under cursor" })
+
+-- === Clipboard Copy ===
+vim.keymap.set("v", "<C-c>", '"+y', { noremap = true, silent = true })
+
+-- === Compile and Run on <leader>r ===
+vim.keymap.set("n", "<leader>r", function()
+	vim.cmd("w")
+	local file = vim.fn.expand("%")
+	local output = vim.fn.expand("%:r")
+	vim.cmd("split | terminal gcc " .. file .. " -o " .. output .. " && ./" .. output)
+end, { desc = "Compile and run current C file" })
+
+-- === Ctrl+Q to Quit ===
+vim.keymap.set("n", "<C-q>", ":q<CR>", { desc = "Quit Neovim" })
+
+-- === Block cursor in all modes ===
+vim.o.guicursor = "n-v-c-sm:block,i-ci-ve:block,r-cr-o:block"
+
+-- === Tabs & Indents ===
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
-vim.opt.smartindent = true
-vim.opt.autoindent = true
-vim.opt.foldmethod = 'indent'
-vim.opt.foldlevel = 99
-vim.opt.termguicolors = true
-vim.opt.updatetime = 250
-vim.opt.signcolumn = "yes"
-vim.cmd [[autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })]]
+vim.opt.expandtab = false
 
--- BASIC KEYBINDS
-vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>f", "<cmd>:Ex<CR>")
-vim.keymap.set("n", "<leader>t",  "<cmd>ToggleTerm<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>l",  "<cmd>LazyGit<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>pf", "<cmd>NvimTreeFocus<CR>")
-vim.keymap.set("n", "<leader>pt", "<cmd>NvimTreeToggle<CR>")
-vim.api.nvim_set_keymap('v', '<C-c>', '"+y<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-Up>", ":lua MoveLineUp()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-Down>", ":lua MoveLineDown()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-k>", ":tabnext<CR>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap("n", "<C-j>", ":tabprevious<CR>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<C-t>', ':tabnew | :Ex<CR>', {noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<C-w>', ':tabclose<CR>', {noremap = true, silent = true})
+-- === File Explorer with NetRW (Ex) ===
+vim.keymap.set("n", "<leader>f", ":Ex<CR>", { desc = "Open file explorer (Ex)" })
+vim.keymap.set("n", "<C-t>", ":tabnew | Ex<CR>", { desc = "New tab with file explorer" })
+vim.keymap.set("n", "<C-Tab>", ":tabnext<CR>", { desc = "Next tab" })
+vim.keymap.set("n", "<C-S-Tab>", ":tabprevious<CR>", { desc = "Previous tab" })
 
+-- === NetRW Appearance Tweaks ===
+vim.g.netrw_banner = 0
+vim.g.netrw_liststyle = 3
+vim.g.netrw_browse_split = 0
+vim.g.netrw_winsize = 25
 
--- FUNCTIONS && SETUP
-function MoveLineDown()
-	local current_line = vim.api.nvim_win_get_cursor(0)[1]
-	if current_line == vim.api.nvim_buf_line_count(0) then
-		return
-	end
-	vim.cmd("move +1")
-	vim.cmd("normal! ==")
-	vim.api.nvim_win_set_cursor(0, {current_line + 1, 0})
-end
+-- === Autopairs ===
+require("nvim-autopairs").setup {}
 
-function MoveLineUp()
-	local current_line = vim.api.nvim_win_get_cursor(0)[1]
-	if current_line == 1 then
-		return
-	end
-	vim.cmd("move -2")
-	vim.cmd("normal! ==")
-	vim.api.nvim_win_set_cursor(0, {current_line - 1, 0})
-end
+vim.cmd("highlight Normal guibg=#211d1d")
+vim.cmd("highlight NormalNC guibg=#211d1d")
+vim.cmd("highlight SignColumn guibg=#211d1d")
+vim.cmd("highlight VertSplit guibg=#211d1d")
 
-vim.diagnostic.config({
-	virtual_text = false,      -- Disable inline virtual text
-	signs = true,              -- Keep the signs in the gutter (left column)
-	underline = true,          -- Keep the underline to highlight the errors
-	float = {                  -- Disable floating windows for diagnostics
-		border = "rounded", -- Use a border for the window
-		focusable = false,  -- Disable focus so it doesn't shift the cursor
-		style = "minimal",  -- Use a minimal style for floating window
-		enable = false
-	},
-	update_in_insert = false,  -- Avoid diagnostic updates while typing
-	severity_sort = true,      -- Keep diagnostics sorted by severity
-})
+vim.keymap.set("v", "<C-c>", '"+y', { noremap = true, silent = true })

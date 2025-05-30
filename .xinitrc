@@ -1,7 +1,4 @@
-setxkbmap -option caps:swapescape &
-nitrogen --restore &
-slstatus &
-
+setxkbmap -option caps:swapescape
 xset r rate 200 50
 xset s off
 xset -dpms
