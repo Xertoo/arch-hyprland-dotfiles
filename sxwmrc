@@ -6,24 +6,32 @@ swap_border_colour       : #c0cbff
 
 # General Options:
 gaps                    : 10
-border_width            : 2
-master_width            : 60 # Percentage of screen width
+border_width            : 1
+master_width            : 60
 resize_master_amount    : 1
+resize_stack_amount		: 20
 snap_distance           : 5
-motion_throttle         : 120 # Set to screen refresh rate for smoothest motions
-should_float            : "Thunar"
+motion_throttle         : 144
+should_float            : "Thunar", "filezilla", "obs", "sxiv", "pcmanfm", "xarchiver", "spotify"
+new_win_focus			: true
+warp_cursor				: true
 
 # Keybinds:
-# Commands must be surrounded with ""
-# Function calls don't need this
-
 mod_key : super
 
 # Application Launchers:
 bind : mod + Return : "st"
+bind : mod + shift + Return : "alacritty"
 bind : mod + b : "firefox"
-bind : mod + p : "dmenu_run_config"
-bind : mod + shift + s : "screenshot"
+# bind : mod + p : "dmenu_run_config"
+# bind : mod + shift + s : "screenshot"
+bind : mod + p : "sh -c 'dmenu_run -fn '\''terminus:bold:pixelsize=18'\'' -nb '\''#211d1d'\'' -nf '\''#d5c4a1'\'' -sb '\''#fabd2f'\'' -sf '\''#211d1d'\'' -p '\''Run:'\'''"
+bind : mod + shift + s : "sh -c 'mkdir -p ~/Pictures/screenshots && maim -s -u ~/Pictures/screenshots/$(date +%F_%H-%M).png | xclip -selection clipboard -t image/png -i'"
+bind : mod + f : "Thunar"
+bind : mod + w : "wallpaper_next"
+
+bind : mod + i : "res_1920x1080"
+bind : mod + o : "res_1380x1080"
 
 # Window Management:
 call : mod + shift + q : close_window
@@ -40,6 +48,8 @@ call : mod + shift + k : master_previous
 # Master Area Resize
 call : mod + l : master_increase
 call : mod + h : master_decrease
+call : mod + n : stack_increase
+call : mod + m : stack_decrease
 
 # Gaps 
 call : mod + equal : increase_gaps
