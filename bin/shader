@@ -1,0 +1,25 @@
+#!/bin/bash
+
+STATE_FILE="$HOME/.cache/hyprshade_mode"
+
+# Jeśli plik stanu nie istnieje, ustaw domyślnie "off"
+if [[ ! -f "$STATE_FILE" ]]; then
+  echo "off" > "$STATE_FILE"
+fi
+
+CURRENT_STATE=$(cat "$STATE_FILE")
+
+if [[ "$CURRENT_STATE" == "off" ]]; then
+  hyprshade on blue-light-filter
+  echo "blue-light-filter" > "$STATE_FILE"
+elif [[ "$CURRENT_STATE" == "blue-light-filter" ]]; then
+  hyprshade on vibrance
+  echo "vibrance" > "$STATE_FILE"
+elif [[ "$CURRENT_STATE" == "vibrance" ]]; then
+  hyprshade off
+  echo "off" > "$STATE_FILE"
+else
+  # Bezpieczny fallback na off
+  hyprshade off
+  echo "off" > "$STATE_FILE"
+fi

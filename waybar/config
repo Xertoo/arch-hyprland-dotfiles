@@ -1,0 +1,89 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 28,
+    "modules-left": ["hyprland/workspaces", "cpu", "custom/memory", "custom/gpuinfo", "custom/audio_visualizer"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": ["pulseaudio", "custom/weather", "custom/gamemode", "custom/power-menu", "custom/shader", "clock", "tray"],
+
+    "hyprland/workspaces": {
+        "on-click": "activate",
+        "format": "{icon}",
+        "format-icons": {
+            "default": "",
+            "active": ""
+        }
+    },
+    "hyprland/window": {
+        "format": "{}"
+    },
+    "tray": {
+        "icon-size": 16,
+        "spacing": 10
+    },
+    "clock": {
+        "format": " {:%H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": " Muted",
+        "on-click": "eww open volpopup",
+        "format-icons": {
+            "default": ["", "", ""]
+        }
+    },
+    "cpu": {
+        "format": " {usage}%",
+        "tooltip": true
+    },
+    "custom/memory": {
+        "format": " {}",
+        "exec": "~/.config/waybar/scripts/memory_usage.sh",
+        "interval": 5,
+        "return-type": "json",
+        "tooltip": true
+    },
+    "custom/gpuinfo": {
+        "format": "󱐋 {text}",
+        "exec": "~/.config/waybar/scripts/gpuinfo.sh",
+        "interval": 5,
+        "return-type": "json",
+        "tooltip": true
+    },
+"custom/audio_visualizer": {
+  "exec": "~/.config/waybar/audio_bars.sh",
+  "interval": 0.1,
+  "on-click": "kitty -e cava",
+  "format": "{}"
+},
+
+    "custom/gamemode": {
+        "format": "{icon}",
+        "exec": "~/.config/waybar/scripts/gamemode_status.sh",
+        "on-click": "~/.config/waybar/scripts/gamemode_toggle.sh",
+        "interval": 1,
+        "tooltip": false,
+        "format-icons": {
+            "on": "",
+            "off": ""
+        }
+    },
+    "custom/weather": {
+        "format": " {}",
+        "tooltip": true,
+        "exec": "~/.config/waybar/scripts/weather.sh",
+        "on-click": "~/.config/waybar/scripts/weather_toggle.sh",
+        "interval": 3600
+    },
+"custom/power-menu": {
+    "format": "⭘",
+    "on-click": "eww open power_menu",
+    "tooltip": false
+},
+"custom/shader": {
+  "format": "󰌁",
+  "on-click": "/usr/local/bin/shader",
+  "tooltip": false
+}
+}

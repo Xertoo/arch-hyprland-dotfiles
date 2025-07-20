@@ -1,0 +1,90 @@
+{
+  "layer": "top",
+  "position": "top",
+  "margin-top": 0,
+  "margin-bottom": 0,
+  "height": 3,
+  "modules-left": ["custom/weather", "clock", "custom/date"],
+  "modules-center": ["hyprland/workspaces"],
+  "modules-right": ["tray", "pulseaudio", "cpu", "memory", "custom/gpu-usage", "custom/gamemode", "custom/power-menu"],
+
+  "custom/power-menu": {
+    "format": "⏻",
+    "tooltip": "Power Menu",
+    "on-click": "~/.config/waybar/scripts/power_menu.sh"
+  },
+
+  "clock": {
+    "format": "{:%I:%M:%S %p}",
+    "tooltip-format": "{:%A, %B %d, %Y}",
+    "interval": 1
+  },
+
+  "custom/weather": {
+    "exec": "~/.config/waybar/scripts/weather.sh",
+    "interval": 600,
+    "on-click": "~/.config/waybar/scripts/weather_toggle.sh",
+    "tooltip": false
+  },
+
+  "custom/date": {
+    "exec": "~/.config/waybar/scripts/date.sh",
+    "interval": 60,
+    "format": "📅 {}",
+    "tooltip": false,
+    "on-click": "eww open date-popup"
+  },
+
+  "tray": {
+    "icon-size": 16,
+    "spacing": 5
+  },
+
+  "pulseaudio": {
+    "format": " {volume}%",
+    "scroll-step": 5,
+    "on-click": "pavucontrol",
+    "format-muted": " {volume}%"
+  },
+
+  "cpu": {
+    "format": " {usage}%",
+    "tooltip": true,
+    "interval": 3
+  },
+
+  "memory": {
+    "format": " {used:0.1f}G",
+    "interval": 5
+  },
+
+  "custom/gpu-usage": {
+    "format": "{} 󰾲",
+    "exec": "~/.config/waybar/scripts/gpuinfo.sh",
+    "return-type": "json",
+    "interval": 5,
+    "tooltip": true,
+    "on-click": "kitty -e nvtop"
+  },
+
+  
+
+  "hyprland/workspaces": {
+    "format": "{icon}",
+    "on-click": "hyprctl dispatch workspace {id}"
+  },
+
+"custom/gamemode": {
+  "format": "{}", 
+  "exec": "~/.config/waybar/scripts/gamemode_status.sh",
+  "on-click": "~/.config/waybar/scripts/gamemode_toggle.sh",
+  "return-type": "json",
+  "interval": 5,
+  "format-icons": {
+  "on": "🔥",
+  "off": "❄️"
+}
+
+}
+
+  }

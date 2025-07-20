@@ -1,0 +1,5 @@
+<eww>
+  <window name="volpopup" anchor="top right" y="5" x="-10" exclusive="false" stack-on-top="true">
+    <volume-slider />
+  </window>
+</eww>

@@ -1,0 +1,84 @@
+;; Zadeklaruj zmienną hover (na początku pliku)
+(defvar volume_hover false)
+
+
+;; Polling głośności z fallbackami
+(defpoll current_volume :interval "1s"
+  "pamixer --get-volume 2>/dev/null || pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | grep -oP '\\d+(?=%)' | head -1 || amixer get Master 2>/dev/null | grep -oP '\\d+(?=%)' | head -1 || echo 50")
+
+;; Widget suwaka głośności z obsługą hover
+(defwidget volume-slider []
+  (box :orientation "horizontal"
+        :space-evenly false
+        :class "vol-wrapper"
+        :onhover "eww update volume_hover=true"
+        :onhoverlost "eww update volume_hover=false"
+        (label :text "🔊"
+               :class "vol-icon")
+        (scale :min 0
+               :max 101
+               :value current_volume
+               :orientation "horizontal"
+               :class "vol-slider"
+               :onchange "pamixer --set-volume {} 2>/dev/null || pactl set-sink-volume @DEFAULT_SINK@ {}% 2>/dev/null || amixer set Master {}% 2>/dev/null")))
+
+;; Okno popup głośności
+(defwindow volpopup
+  :monitor "DELL G2722HS"
+  :geometry (geometry :x "1400px" ;; Teraz Eww powinien znać tę zmienną
+                      :y "0px"                 ;; Wysokość Waybara (28px) + 5px marginesu
+                      :width "150px"            ;; Szerokość suwaka (dostosuj!)
+                      :height "10px"            ;; Wysokość suwaka (dostosuj!)
+                      :anchor "top left")       ;; Kotwiczymy do lewego górnego rogu
+  :stacking "overlay"
+  :exclusive false
+  :focusable false
+  :wm-ignore true
+  :visible volume_hover
+  (eventbox :onhoverlost "eww close volpopup"
+            (volume-slider)))
+
+;; Okno menu zasilania (bez zmian, dla kontekstu)
+(defwindow power_menu
+  :monitor "DELL G2722HS"
+  :geometry (geometry :anchor "center" :width 280 :height 200)
+  :stacking "overlay"
+  :wm-ignore false
+  (box
+    :class "power-menu"
+    :orientation "v"
+    :spacing 15
+    :halign "center"
+    :valign "center"
+
+    (label :class "title" :text "Power Menu" :halign "center")
+
+    (box :orientation "v" :spacing 8 :halign "fill"
+
+      (button :onclick "systemctl reboot" :class "btn reboot"
+        (box :orientation "h" :halign "fill" :valign "center"
+          (label :class "icon" :text "󰜉" :halign "start" :valign "center" :min-width 30)
+          (box :hexpand true :halign "fill"
+            (label :text "Reboot" :halign "center" :valign "center"))
+          (box :min-width 30)))
+
+      (button :onclick "systemctl poweroff" :class "btn shutdown"
+        (box :orientation "h" :halign "fill" :valign "center"
+          (label :class "icon" :text "󰐥" :halign "start" :valign "center" :min-width 30)
+          (box :hexpand true :halign "fill"
+            (label :text "Shutdown" :halign "center" :valign "center"))
+          (box :min-width 30)))
+
+      (button :onclick "mpv --no-terminal /usr/local/bin/sounds/pixel-death-66829.mp3 & hyprctl dispatch exec hyprlock && eww close power_menu" :class "btn lock"
+        (box :orientation "h" :halign "fill" :valign "center"
+          (label :class "icon" :text "󰌾" :halign "start" :valign "center" :min-width 30)
+          (box :hexpand true :halign "fill"
+            (label :text "Lock" :halign "center" :valign "center"))
+          (box :min-width 30)))
+
+      (button :onclick "eww close power_menu" :class "btn cancel"
+        (box :orientation "h" :halign "fill" :valign "center"
+          (label :class "icon" :text "󰅖" :halign "start" :valign "center" :min-width 30)
+          (box :hexpand true :halign "fill"
+            (label :text "Cancel" :halign "center" :valign "center"))
+          (box :min-width 30))))))

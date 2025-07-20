@@ -1,0 +1,6 @@
+#!/bin/bash
+file=$(find ~/wallpapers -type f | sed 's|.*/||' | dmenu -i -l 40 | xargs -I{} find ~/wallpapers -type f -name "{}" | head -n 1)
+[ -z "$file" ] && exit
+swww img "$file" --transition-type wipe --transition-angle 70 --transition-fps 200 --transition-duration 1.9
+sleep 0.1
+mpv --volume=130 /usr/local/bin/sounds/page-flipping-99368.mp3

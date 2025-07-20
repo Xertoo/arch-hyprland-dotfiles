@@ -1,0 +1,42 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "Monocraft";
+    font-weight: bold;
+    font-size: 12px;
+    min-height: 0;
+     margin: 0px;             /* Brak marginesów */
+  padding: 0px;            /* Brak paddingu */
+  border: 2px;
+}
+
+window#waybar { 
+    background: transparent;
+
+}
+
+#workspaces button {
+    padding: 0 5px;
+    background: transparent;
+    color: #0d580d;
+    border-bottom: 2px solid transparent;
+}
+
+#workspaces button.active {
+    color: #73ff21;
+    border-bottom: 2px solid #1cffc6;
+}
+#custom-audio_visualizer {
+    font-family: Monocraft, monospace;
+    font-size: 13px;
+    color: #69ff44;
+    background: transparent;
+    padding: 0 1px;
+    border-radius: 0px;
+}
+
+#window, #clock, #battery, #pulseaudio, #tray, #custom-gamemode, #custom-weather, #cpu, #custom-gpuinfo, #custom-memory,#custom-shader, #custom-power-menu, #custom-shutdown {
+    padding: 0 5px;
+    margin:  0 15px;
+    color: #a18e20;
+}

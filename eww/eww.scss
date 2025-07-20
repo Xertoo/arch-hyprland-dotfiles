@@ -1,0 +1,101 @@
+* {
+  all: unset;
+  font-family: "Monocraft";
+}
+
+/* Power Menu Styles */
+.power-menu {
+  background: transparent;
+  padding: 15px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #cedb17;
+  margin-bottom: 15px;
+}
+
+.btn {
+  padding: 10px 15px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.15s ease;
+  min-width: 180px;
+}
+
+.btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.icon {
+  font-size: 14px;
+}
+
+/* Volume Slider Styles */
+.vol-wrapper {
+  background: rgba(0, 0, 0, 0.445);
+  padding: 10px 15px;
+  border-radius: 6px;
+  border: 1px solid rgba(170, 58, 204, 0.651);
+  min-width: 200px;
+  transition: all 0.15s ease;
+}
+
+.vol-wrapper:hover {
+  background: rgba(216, 59, 59, 0.9);
+  border-color: rgb(255, 0, 0);
+}
+
+.vol-icon {
+  margin-right: 10px;
+  opacity: 0.8;
+  font-size: 16px;
+  color: #000000;
+}
+
+.vol-slider {
+  min-width: 150px;
+  background: transparent;
+  border-radius: 3px;
+  padding: 0 16px;
+  
+  trough {
+    background: transparent;
+    border-radius: 3px;
+    min-height: 6px;
+  }
+  
+  highlight {
+    background: #17a3db;
+    border-radius: 90000px;
+  }
+  
+  slider {
+    background: #185485;
+    border-radius: 50%;
+    min-width: 12px;
+    min-height: 12px;
+    margin: -9px 0;
+    border: 3px solid #17b4db;
+    transition: all 0.2s ease;
+  }
+  
+  slider:hover {
+    background: #c6dbf8;
+    min-width: 32px;
+    min-height: 32px;
+    margin: -13px 0;
+  }
+  
+  slider:active {
+    background: #4f3550;
+    border-width: 2px;
+    min-width: 22px;
+    min-height: 22px;
+    margin: -8px 0;
+  }
+}
